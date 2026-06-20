@@ -9,8 +9,7 @@ https://ai-quote-generator-akshay.streamlit.app/
 
 📂 GitHub Repository
 https://github.com/akshay-phulwani/ai-quote-generator
-Source Code:
-AI Quote Generator Repository
+
 
 ✨ Features
 Generate quotes from a starting word or sentence
