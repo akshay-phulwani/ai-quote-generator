@@ -15,8 +15,12 @@ with open("max_len.pkl", "rb") as f:
 
 index_word = tok.index_word
 
-
 def generate_quote(seed_text, next_words=15):
+
+    seq = tok.texts_to_sequences([seed_text])
+
+    if len(seq[0]) == 0:
+        return "Please enter words from the training vocabulary."
 
     for _ in range(next_words):
 
@@ -33,26 +37,47 @@ def generate_quote(seed_text, next_words=15):
 
         pred_word_id = np.argmax(pred)
 
-        next_word = index_word.get(pred_word_id, "")
+        next_word = index_word.get(
+            pred_word_id,
+            ""
+        )
+
+        if next_word == "":
+            break
 
         seed_text += " " + next_word
 
     return seed_text
 
+st.set_page_config(
+    page_title="AI Quote Generator",
+    page_icon="🤖"
+)
 
-st.title("AI Quote Generator")
+st.title("🤖 AI Quote Generator")
+
+st.write(
+    "Generate motivational quotes using a Deep Learning LSTM model."
+)
 
 seed_text = st.text_input(
-    "Enter starting word or sentence"
+    "Enter a starting word or sentence"
+)
+
+num_words = st.slider(
+    "Number of words to generate",
+    min_value=5,
+    max_value=30,
+    value=15
 )
 
 if st.button("Generate Quote"):
 
-    if seed_text:
+    if seed_text.strip():
 
         result = generate_quote(
             seed_text,
-            15
+            num_words
         )
 
         st.success(result)
@@ -60,5 +85,11 @@ if st.button("Generate Quote"):
     else:
 
         st.warning(
-            "Please enter some text"
+            "Please enter some text."
         )
+
+st.markdown("---")
+
+st.caption(
+    "Built with TensorFlow, LSTM and Streamlit"
+)
