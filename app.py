@@ -8,88 +8,91 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 model = load_model("quote_generator.keras")
 
 with open("tokenizer.pkl", "rb") as f:
-    tok = pickle.load(f)
+tok = pickle.load(f)
 
 with open("max_len.pkl", "rb") as f:
-    max_len = pickle.load(f)
+max_len = pickle.load(f)
 
 index_word = tok.index_word
 
-def generate_quote(seed_text, next_words=15):
+def generate_quote(seed_text, next_words=5):
 
-    seq = tok.texts_to_sequences([seed_text])
+```
+seq = tok.texts_to_sequences([seed_text])
 
-    if len(seq[0]) == 0:
-        return "Please enter words from the training vocabulary."
+if len(seq[0]) == 0:
+    return "Please enter words from the training vocabulary."
 
-    for _ in range(next_words):
+for _ in range(next_words):
 
-        seq = tok.texts_to_sequences([seed_text])[0]
+    seq = tok.texts_to_sequences([seed_text])[0]
 
-        seq = pad_sequences(
-            [seq],
-            maxlen=max_len,
-            padding="pre",
-            truncating="pre"
-        )
+    seq = pad_sequences(
+        [seq],
+        maxlen=max_len,
+        padding="pre",
+        truncating="pre"
+    )
 
-        pred = model.predict(seq, verbose=0)
+    pred = model.predict(seq, verbose=0)[0]
 
-        pred_word_id = np.argmax(pred)
+    pred_word_id = np.random.choice(
+        len(pred),
+        p=pred / np.sum(pred)
+    )
 
-        next_word = index_word.get(
-            pred_word_id,
-            ""
-        )
+    next_word = index_word.get(
+        pred_word_id,
+        ""
+    )
 
-        if next_word == "":
-            break
+    if next_word == "":
+        break
 
-        seed_text += " " + next_word
+    if next_word in seed_text.split():
+        continue
 
-    return seed_text
+    seed_text += " " + next_word
+
+return seed_text
+```
 
 st.set_page_config(
-    page_title="AI Quote Generator",
-    page_icon="🤖"
+page_title="AI Quote Generator",
+page_icon="🤖"
 )
 
 st.title("🤖 AI Quote Generator")
 
 st.write(
-    "Generate motivational quotes using a Deep Learning LSTM model."
+"Generate motivational quotes using a Deep Learning LSTM model."
 )
 
 seed_text = st.text_input(
-    "Enter a starting word or sentence"
-)
-
-num_words = st.slider(
-    "Number of words to generate",
-    min_value=5,
-    max_value=30,
-    value=15
+"Enter a starting word or sentence"
 )
 
 if st.button("Generate Quote"):
 
-    if seed_text.strip():
+```
+if seed_text.strip():
 
-        result = generate_quote(
-            seed_text,
-            num_words
-        )
+    result = generate_quote(
+        seed_text,
+        5
+    )
 
-        st.success(result)
+    st.success(result)
 
-    else:
+else:
 
-        st.warning(
-            "Please enter some text."
-        )
+    st.warning(
+        "Please enter some text."
+    )
+```
 
 st.markdown("---")
 
 st.caption(
-    "Built with TensorFlow, LSTM and Streamlit"
+"Built with TensorFlow, LSTM and Streamlit"
 )
