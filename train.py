@@ -8,7 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense
 from sklearn.model_selection import train_test_split
 
-df = pd.read_csv("qoute_dataset (1).csv")
+df = pd.read_csv("qoute_dataset.csv")
 
 texts = df["quote"]
 
